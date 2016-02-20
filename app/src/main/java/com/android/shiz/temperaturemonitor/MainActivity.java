@@ -9,27 +9,31 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.shiz.temperaturemonitor.connection.Connector;
-import com.android.shiz.temperaturemonitor.listener.Observer;
-import com.android.shiz.temperaturemonitor.listener.TemperatureDataObject;
+import java.util.Observable;
+import java.util.Observer;
 
-public class MainActivity extends AppCompatActivity implements Observer{
+public class MainActivity extends AppCompatActivity implements Observer {
     public static int REQUEST_BLUETOOTH = 1;
+    App app;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        checkBluetooth();
-        Connector connector = new Connector();
+        app = (App) getApplication();
+        app.getObserver().addObserver(this);
+        Log.d("MainActivity", String.valueOf(app.getObserver().getTemperature()));
+//        checkBluetooth();
         final EditText temperatureText = (EditText) findViewById(R.id.temperatureText);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -44,11 +48,11 @@ public class MainActivity extends AppCompatActivity implements Observer{
             @Override
             public void onClick(View v) {
                 String degree = temperatureText.getText().toString();
-                if(!degree.equals("")){
-                    temperatureChanged(Float.valueOf(degree));
-                    temperatureText.setText("");}
-                else
-                    Toast.makeText(MainActivity.this, "¬ведите значение",Toast.LENGTH_SHORT).show();
+                if (!degree.equals("")) {
+                    app.getObserver().setTemperature(Float.valueOf(degree));
+                    temperatureText.setText("");
+                } else
+                    Toast.makeText(MainActivity.this, R.string.enter_temperature, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -75,13 +79,7 @@ public class MainActivity extends AppCompatActivity implements Observer{
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void temperatureChanged(float temperature) {
-        TemperatureDataObject temp = new TemperatureDataObject();
-        temp.setTemperature(temperature);
-    }
-
-    private void checkBluetooth(){
+    private void checkBluetooth() {
         BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
         // Phone does not support Bluetooth so let the user know and exit.
         if (BTAdapter == null) {
@@ -95,10 +93,16 @@ public class MainActivity extends AppCompatActivity implements Observer{
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
-        }else if(!BTAdapter.isEnabled())
-        {
+        } else if (!BTAdapter.isEnabled()) {
             Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBT, REQUEST_BLUETOOTH);
         }
+    }
+
+
+    @Override
+    public void update(Observable observable, Object temperature) {
+        Toast.makeText(MainActivity.this, (int) temperature, Toast.LENGTH_SHORT).show();
+
     }
 }

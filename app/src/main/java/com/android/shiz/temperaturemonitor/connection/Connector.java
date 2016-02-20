@@ -1,13 +1,11 @@
 package com.android.shiz.temperaturemonitor.connection;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
-import com.android.shiz.temperaturemonitor.listener.Observer;
-import com.android.shiz.temperaturemonitor.listener.TemperatureDataObject;
-import com.google.gson.JsonObject;
+import com.android.shiz.temperaturemonitor.App;
 
 import java.io.IOException;
-import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -19,19 +17,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Created by OldMan on 20.02.2016.
  */
-public class Connector implements Observer {
+public class Connector {
     public static final String API_URL = "http://192.168.0.1:10080/";
-
+    App app;
     private static final OkHttpClient CLIENT = new OkHttpClient();
 
-    public Connector() {
-        TemperatureDataObject temperatureDataObject = new TemperatureDataObject();
-        temperatureDataObject.addObserver(this);
-
-    }
-
     @NonNull
-    public static ServerService getService() {
+    private static ServerService getService() {
         return getRetrofit().create(ServerService.class);
     }
 
@@ -43,31 +35,9 @@ public class Connector implements Observer {
                 .build();
     }
 
-    @Override
-    public void temperatureChanged(float temperature) {
-
+    public static void sendRequest(Request request) {
         // Prepare the HTTP request
-        Call<ServerService> call = getService().sendDegree(new Request("ID-1", temperature), new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (!response.isSuccess()) {
-                    // print response body if unsuccessful
-                    try {
-                        System.out.println(response.errorBody().string());
-                    } catch (IOException e) {
-                        // do nothing
-                    }
-                    return;
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println("onFailure");
-                System.out.println(t.getMessage());
-            }
-        });
-
+        Log.d("Connector", "degree " + request.getValue());
+        Call<ServerService> call = getService().sendDegree(request.getDev(), request.toString());
     }
-
-}
+    }
