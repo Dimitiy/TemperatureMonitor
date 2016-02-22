@@ -18,7 +18,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by OldMan on 20.02.2016.
  */
 public class Connector {
-    public static final String API_URL = "http://192.168.0.1:10080/";
+    private static final String LOG_TAG = Connector.class.getSimpleName();
+    public static final String API_URL = "http://192.168.0.31:8080/";
     App app;
     private static final OkHttpClient CLIENT = new OkHttpClient();
 
@@ -38,6 +39,17 @@ public class Connector {
     public static void sendRequest(Request request) {
         // Prepare the HTTP request
         Log.d("Connector", "degree " + request.getValue());
-        Call<ServerService> call = getService().sendDegree(request.getDev(), request.toString());
+        Call<ServerService> call = getService().sendDegree(request.getDev(), String.valueOf(request.getValue()));
+        call.enqueue(new Callback<ServerService>() {
+            @Override
+            public void onResponse(Call<ServerService> call, Response<ServerService> response) {
+                Log.d(LOG_TAG, "onResponse: " + response.toString());
+            }
+
+            @Override
+            public void onFailure(Call<ServerService> call, Throwable t) {
+                Log.d(LOG_TAG, "onFailure: " + t.getMessage());
+            }
+        });
     }
-    }
+}
