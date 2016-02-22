@@ -19,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class Connector {
     private static final String LOG_TAG = Connector.class.getSimpleName();
-    public static final String API_URL = "http://192.168.0.31:8080/";
+    public static final String API_URL = App.getIP();
     App app;
     private static final OkHttpClient CLIENT = new OkHttpClient();
 

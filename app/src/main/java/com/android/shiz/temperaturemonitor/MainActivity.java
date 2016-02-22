@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         setSupportActionBar(toolbar);
         app = (App) getApplication();
         app.getObserver().addObserver(this);
-        Log.d("MainActivity", String.valueOf(app.getObserver().getTemperature()));
+
 //        checkBluetooth();
         final EditText temperatureText = (EditText) findViewById(R.id.temperatureText);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -73,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+          SettingsDialog.show(this);
+           return true;
         }
 
         return super.onOptionsItemSelected(item);
