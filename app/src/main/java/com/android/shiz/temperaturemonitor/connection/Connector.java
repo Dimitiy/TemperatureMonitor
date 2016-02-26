@@ -5,8 +5,6 @@ import android.util.Log;
 
 import com.android.shiz.temperaturemonitor.App;
 
-import java.io.IOException;
-
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -19,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class Connector {
     private static final String LOG_TAG = Connector.class.getSimpleName();
-    public static final String API_URL = App.getIP();
+    public static final String API_URL = "http://" + App.getIP() + ":8080/";
     App app;
     private static final OkHttpClient CLIENT = new OkHttpClient();
 

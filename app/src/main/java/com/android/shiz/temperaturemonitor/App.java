@@ -18,7 +18,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         App.context = getApplicationContext();
-
         mTemperature = new TemperatureObservable();
     }
 
