@@ -57,7 +57,7 @@ public class BluetoothService {
     private AcceptThread mInsecureAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    private int mState;
+    private int mState = 0;
 
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -204,7 +204,6 @@ public class BluetoothService {
         bundle.putString(Constants.DEVICE_NAME, device.getName());
         msg.setData(bundle);
         mHandler.sendMessage(msg);
-
         setState(STATE_CONNECTED);
     }
 
@@ -416,40 +415,31 @@ public class BluetoothService {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
                 mmSocket.connect();
+                synchronized (BluetoothService.this) {
+                    mConnectThread = null;
+                }
+                Log.d(TAG, "before connected");
+                // Start the connected thread
+                connected(mmSocket, mmDevice, mSocketType);
+                Log.e(TAG, "Connected");
             } catch (IOException e) {
                 Log.w(TAG, "mes: " + e.getMessage());
 
                 try {
-                    Log.e(TAG,"trying fallback...");
+                    Log.e(TAG, "trying fallback...");
 
-                    mmSocket =(BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice, 2);
+                    mmSocket = (BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class}).invoke(mmDevice, 2);
                     mmSocket.connect();
+                    // Reset the ConnectThread because we're done
 
-                    Log.e(TAG,"Connected");
-                }
-                catch (Exception e2) {
+                } catch (Exception e2) {
                     Log.e(TAG, "Couldn't establish Bluetooth connection!");
                     Log.e(TAG, e2.getMessage());
                 }
 
-                // Close the socket
-//                try {
-//                    mmSocket.close();
-//                } catch (IOException e2) {
-//                    Log.e(TAG, "unable to close() " + mSocketType +
-//                            " socket during connection failure", e2);
-//                }
-//                connectionFailed();
-//                return;
             }
 
-            // Reset the ConnectThread because we're done
-            synchronized (BluetoothService.this) {
-                mConnectThread = null;
-            }
-            Log.d(TAG, "before connected");
-            // Start the connected thread
-            connected(mmSocket, mmDevice, mSocketType);
+
         }
 
         public void cancel() {
@@ -469,6 +459,7 @@ public class BluetoothService {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private StringBuilder sb = new StringBuilder();
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
             Log.d(TAG, "create ConnectedThread: " + socketType);
@@ -490,7 +481,7 @@ public class BluetoothService {
 
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[4096];
             int bytes;
 
             // Keep listening to the InputStream while connected
@@ -498,10 +489,27 @@ public class BluetoothService {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
-
                     // Send the obtained bytes to the UI Activity
                     mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
+                    String message = new String(buffer, 0, bytes);
+                    sb.append(message);                                                // формируем строку
+                    int endOfLineIndex = sb.indexOf("\r\n");
+                    if (endOfLineIndex > 0) {                                            // если встречаем конец строки,
+                        String sbprint = sb.substring(0, endOfLineIndex);               // то извлекаем строку
+                        Log.d(TAG, "sbprint: " + sbprint);
+
+                        sb.delete(0, sb.length());
+                        if (isFloat(sbprint) && sbprint.length() < 7) {
+                            Data.setTemperature(Float.valueOf(sbprint));
+                            App.getObserver().setTemperature(Data.getMAC(), Float.valueOf(sbprint));
+                        } else if (sbprint.length() > 7) {
+                            if (!Data.getMAC().equals(sbprint)) {
+                                Data.setMAC(sbprint);
+                            }
+                        }
+
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -535,6 +543,15 @@ public class BluetoothService {
             } catch (IOException e) {
                 Log.e(TAG, "close() of connect socket failed", e);
             }
+        }
+    }
+
+    private boolean isFloat(String readMessage) {
+        try {
+            Float.parseFloat(readMessage);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 }

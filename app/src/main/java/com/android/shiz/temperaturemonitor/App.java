@@ -11,7 +11,7 @@ import com.android.shiz.temperaturemonitor.listener.TemperatureObservable;
  * Created by OldMan on 21.02.2016.
  */
 public class App extends Application {
-    TemperatureObservable mTemperature;
+   static TemperatureObservable mTemperature;
     private static Context context;
 
     @Override
@@ -19,11 +19,12 @@ public class App extends Application {
         super.onCreate();
         App.context = getApplicationContext();
         mTemperature = new TemperatureObservable();
+
     }
 
     public static String getIP(){
        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-       return sp.getString("ip", "192.168.0.1");
+       return sp.getString("ip", "78.110.63.203");
     }
     public static void setIP(String ip){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -31,7 +32,7 @@ public class App extends Application {
         ed.putString("ip", ip);
         ed.commit();
     }
-    public TemperatureObservable getObserver() {
+    public static TemperatureObservable getObserver() {
         return mTemperature;
     }
 

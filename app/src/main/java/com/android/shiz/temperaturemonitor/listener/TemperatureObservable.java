@@ -14,9 +14,9 @@ public class TemperatureObservable extends Observable {
         return temperature;
     }
 
-    public void setTemperature(float temperature) {
+    public void setTemperature(String dev, float temperature) {
         this.temperature = temperature;
-        Request request = new Request("111", temperature);
+        Request request = new Request(dev, temperature);
         Connector.sendRequest(request);
         notifyObservers(this.temperature);
     }

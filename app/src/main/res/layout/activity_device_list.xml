@@ -11,10 +11,11 @@
      limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:touchscreenBlocksFocus="false"
+             >
 
     <TextView
         android:id="@+id/title_paired_devices"
@@ -33,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:stackFromBottom="true"
+        android:theme="@style/Widget.AppCompat.ListView"
         />
 
     <TextView
@@ -52,6 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="2"
         android:stackFromBottom="true"
+        android:theme="@style/Widget.AppCompat.ListView"
         />
 
     <Button
@@ -59,5 +62,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_scan"
-        />
+        android:src="@android:drawable/btn_dialog"
+        android:textColor="@android:color/primary_text_dark"/>
+        <!--android:background="?attr/selectableItemBackground"/>-->
+        <!--android:theme="@style/Widget.AppCompat.Button.Colored"-->
+    <!--android:backgroundTint="@color/colorPrimaryDark"-->
+
+
 </LinearLayout>

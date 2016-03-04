@@ -1,9 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Мониторинг температуры</string>
 
     <string name="enter_temperature">Введите значение</string>
     <string name="enter_ip">Введите ip-адрес сервера </string>
     <string name="action_settings">Настройки</string>
+    <string name="send">Отправить</string>
+    <string name="not_connected">Устройство не подключено</string>
+    <string name="bt_not_enabled_leaving">Bluetooth недоступен</string>
+    <string name="title_connecting">подключение...</string>
+    <string name="title_connected_to">подключено к <xliff:g id="device_name">%1$s</xliff:g></string>
+    <string name="title_connected">подключено</string>
 
+    <string name="title_activity_error">Ошибка</string>
+    <string name="title_not_connected">нет подключения</string>
+
+    <!--  DeviceListActivity -->
+    <string name="scanning">Поиск устройств...</string>
+    <string name="select_device">Выберите устройство</string>
+    <string name="none_paired">Сопряженные устройства не найдены</string>
+    <string name="none_found">Устройства не найдены</string>
+    <string name="title_paired_devices">Сопряженные устройства</string>
+    <string name="title_other_devices">Другие доступные устройства</string>
+    <string name="button_scan">Поиск устройств</string>
 </resources>
